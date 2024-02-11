@@ -1,40 +1,40 @@
 from app import db
 from app.models import tbl_user
+from flask import request, jsonify
 
 def register_user(data):
-    new_item = tbl_user(
+    new_user = tbl_user(
         name=data['name'],
         phone_number=data['phone_number'],
-        description=data.get('description', ''),
-        username=data.get('username', '')
+        username=data['username']
     )
-    db.session.add(new_item)
+    db.session.add(new_user)
     db.session.commit()
-    return {'message': 'Item created successfully'}
+    return jsonify({'message': 'User created successfully'})
 
 def register_all_user():
-    items = tbl_user.query.all()
-    return [{'id': item.id, 'name': item.name, 'description': item.description} for item in items]
+    users = tbl_user.query.all()
+    return [{'id': user.id, 'name': user.name, 'description': user.description} for user in users]
 
-def get_register_user(item_id):
-    item = tbl_user.query.get(item_id)
-    if item:
-        return {'id': item.id, 'name': item.name, 'description': item.description}
-    return {'message': 'Item not found'}, 404
+def get_register_user(user_id):
+    user = tbl_user.query.get(user_id)
+    if user:
+        return {'id': user.id, 'name': user.name, 'description': user.description}
+    return {'message': 'User not found'}, 404
 
-def update_register_user(item_id, data):
-    item = tbl_user.query.get(item_id)
-    if item:
-        item.name = data.get('name', item.name)
-        item.description = data.get('description', item.description)
+def update_register_user(user_id, data):
+    user = tbl_user.query.get(user_id)
+    if user:
+        user.name = data.get('name', user.name)
+        user.description = data.get('description', user.description)
         db.session.commit()
-        return {'message': 'Item updated successfully'}
-    return {'message': 'Item not found'}, 404
+        return {'message': 'User updated successfully'}
+    return {'message': 'User not found'}, 404
 
-def delete_register_user(item_id):
-    item = tbl_user.query.get(item_id)
-    if item:
-        db.session.delete(item)
+def delete_register_user(user_id):
+    user = tbl_user.query.get(user_id)
+    if user:
+        db.session.delete(user)
         db.session.commit()
-        return {'message': 'Item deleted successfully'}
-    return {'message': 'Item not found'}, 404
+        return {'message': 'User deleted successfully'}
+    return {'message': 'User not found'}, 404
