@@ -1,40 +1,53 @@
 from app import db
 from app.models import tbl_user
-from flask import request, jsonify
+from flask import jsonify
 
 def register_user(data):
-    new_user = tbl_user(
-        name=data['name'],
-        phone_number=data['phone_number'],
-        username=data['username']
-    )
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({'message': 'User created successfully'})
+    existing_phone = tbl_user.query.filter_by(phone_number=data['phone_number']).first()
+    if existing_phone:
+        return jsonify({'Success': False, 'Message': 'User with this phone number already exists.'}), 400
+    try:
+        new_user = tbl_user(
+            name=data['name'],
+            phone_number=data['phone_number'],
+            username=data['username']
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({'Success': True, 'Message': 'User created successfully.'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'Success': False, 'Message': str(e)}), 400
 
 def register_all_user():
-    users = tbl_user.query.all()
-    return [{'id': user.id, 'name': user.name, 'description': user.description} for user in users]
+    try:
+        users = tbl_user.query.all()
+        user_list = [{'id': user.id, 'name': user.name, 'phone_number': user.phone_number, 'username': user.username} for user in users]
+        return {'Success': True, 'Message': 'Ok', 'data' : user_list}  # Returning a list of dictionaries
+    except Exception as e:
+        return {'Success': False, 'Message': str(e)}  # Returning an error message
 
 def get_register_user(user_id):
-    user = tbl_user.query.get(user_id)
-    if user:
-        return {'id': user.id, 'name': user.name, 'description': user.description}
-    return {'message': 'User not found'}, 404
+    try:
+        user = tbl_user.query.filter_by(id=user_id).first()
+        print('Register', user)
+        if user:
+            return jsonify({'id': user.id, 'name': user.name, 'username': user.username})
+        return jsonify({'Message': 'User not found'}), 404
+    except Exception as e:
+        return jsonify({'Success': False, 'Message': str(e)}), 400
+
 
 def update_register_user(user_id, data):
-    user = tbl_user.query.get(user_id)
-    if user:
-        user.name = data.get('name', user.name)
-        user.description = data.get('description', user.description)
-        db.session.commit()
-        return {'message': 'User updated successfully'}
-    return {'message': 'User not found'}, 404
+    try:
+        
+        return True
+    except Exception as e:
+        return jsonify({'Success': False, 'Message': str(e)}), 400
 
 def delete_register_user(user_id):
-    user = tbl_user.query.get(user_id)
-    if user:
-        db.session.delete(user)
-        db.session.commit()
-        return {'message': 'User deleted successfully'}
-    return {'message': 'User not found'}, 404
+    try:
+
+        return True
+    except Exception as e:
+        return jsonify({'Success': False, 'Message': str(e)}), 400
