@@ -16,8 +16,8 @@ def regi_user_and_list():
 def update_get_delete_regi_user(user_id):
     if request.method == 'POST':
         data = request.get_json()
-        return jsonify(update_register_user(user_id, data))
+        return update_register_user(user_id, data)
     elif request.method == 'DELETE':  # Adding an elif condition for DELETE method
-        return jsonify(delete_register_user(user_id))
+        return delete_register_user(user_id)
     else:
-        return jsonify(get_register_user(user_id))
+        return get_register_user(user_id)
